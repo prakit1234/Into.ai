@@ -7,7 +7,7 @@
 ![Status](https://img.shields.io/badge/status-active-brightgreen.svg?style=flat-square)
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/prakit1234/into.ai/public/logo.png" alt="Into.AI Logo" width="400" />
+  <img src="https://i.ibb.co/xt66pCdQ/Screenshot-2025-04-08-213428.png" alt="Into.AI Logo" width="400" />
 </p>
 
 ## ⚠️ IMPORTANT NOTICE ⚠️
