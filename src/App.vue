@@ -35,7 +35,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen flex flex-col bg-gray-50">
     <!-- Navigation -->
     <nav class="bg-white shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -126,12 +126,12 @@ onMounted(() => {
     </div>
 
     <!-- Main Content -->
-  <main>
+    <main class="flex-grow">
       <router-view></router-view>
-  </main>
+    </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-12">
+    <footer class="bg-white border-t border-gray-200">
       <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center">
           <div class="text-gray-500 text-sm">
@@ -161,5 +161,17 @@ onMounted(() => {
 
 .prose {
   max-width: none;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 </style>
