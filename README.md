@@ -1,8 +1,26 @@
 # Into.AI - AI-Powered Instruction Assistant
 
-Into.AI is an open-source intelligent instruction generation platform that uses Google's Gemini AI to provide detailed, customized instructions for any task. The application offers three levels of instruction detail to suit different user needs.
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?style=flat-square)
+![License](https://img.shields.io/badge/license-PERSONAL_USE_ONLY-red.svg?style=flat-square)
+![Made with Love](https://img.shields.io/badge/made%20with-♥-ff69b4.svg?style=flat-square)
+![Vue.js](https://img.shields.io/badge/Vue.js-3.x-42b883.svg?style=flat-square)
+![Status](https://img.shields.io/badge/status-active-brightgreen.svg?style=flat-square)
 
-## Features
+<p align="center">
+  <img src="https://raw.githubusercontent.com/prakit1234/into.ai/public/logo.png" alt="Into.AI Logo" width="400" />
+</p>
+
+## ⚠️ IMPORTANT NOTICE ⚠️
+
+**THIS REPOSITORY IS PRIVATE AND FOR PERSONAL USE ONLY**
+
+This project is not open for cloning, forking, or any form of reproduction without explicit written permission. All code and associated assets are the exclusive property of the author and are protected by applicable copyright laws.
+
+## Overview
+
+Into.AI is my intelligent instruction generation platform that uses Google's Gemini AI to provide detailed, customized instructions for any task. The application offers three levels of instruction detail to suit different user needs.
+                              
+## Key Features
 
 - **Three Instruction Variants:**
   - Basic: Quick, essential instructions
@@ -12,98 +30,66 @@ Into.AI is an open-source intelligent instruction generation platform that uses 
 - **Google Authentication:** Secure login using Google OAuth
 - **Blog Section:** Insights and tutorials about using the platform
 - **Error Guide:** Comprehensive troubleshooting documentation
+- **Modern UI:** Clean, responsive design with Tailwind CSS
 
-## Prerequisites
+## Technical Requirements
 
 - Node.js 16.x or higher
 - Google Cloud Platform account
 - Gemini API access
 
-## Setup
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/into.ai.git
-   cd into.ai
-   ```
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+## Usage Guide
 
-3. Configure environment variables:
-   ```bash
-   cp .env.example .env
-   ```
-   Edit `.env` and add your:
-   - Google OAuth Client ID
-   - Gemini API Key
+1. Login with Google 
+2. Select your preferred instruction type
+3. Enter your question or task
+4. Receive AI-generated instructions tailored to your needs
 
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-## Environment Variables
-
-Create a `.env` file in the root directory with the following content:
-
-```
-# Google OAuth Client ID (required for authentication)
-VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
-
-# Gemini API Key (required for AI functionality)
-VITE_GEMINI_API_KEY=your_gemini_api_key_here
-
-# Optional: Analytics ID
-VITE_ANALYTICS_ID=your_analytics_id_here
-```
-
-Replace the placeholder values with your actual API keys and credentials.
-
-## Configuration
-
-### Google OAuth Setup
-
-1. Go to the [Google Cloud Console](https://console.cloud.google.com)
-2. Create a new project or select an existing one
-3. Enable the Google OAuth API
-4. Configure the OAuth consent screen
-5. Create OAuth 2.0 credentials
-6. Add your application's domain to the authorized origins
-7. Copy the Client ID to your `.env` file
-
-### Gemini API Setup
-
-1. Visit [AI Studio](https://aistudio.google.com)
-2. Create a new API key
-3. Copy the API key to your `.env` file
-
-## Usage
-
-1. Visit the application in your browser
-2. Sign in with your Google account
-3. Select the instruction type you need
-4. Enter your question or task
-5. Receive AI-generated instructions
-
-## Development
+## Development Commands
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 
-## Contributing
+## My Tech Stack
 
-This is an open-source project. Contributions are welcome!
+- Vue.js 3 with Composition API
+- TypeScript for type safety
+- Tailwind CSS for styling
+- Vite for fast development
+- Google Gemini API for AI capabilities
+- Google OAuth for authentication
 
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+## Legal Information
 
-## License
+This project is NOT licensed under any open-source license. All rights reserved.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+No permission is granted for:
+- Commercial use
+- Distribution
+- Modification
+- Private use by unauthorized individuals
+
+## Credit
+
+Original concept inspired by work from Prakit Chetia, with significant modifications and enhancements.
+
+## Author
+
+<p align="center">
+  <img src="https://avatars.githubusercontent.com/u/prakit1234" alt="Your Name" width="150" height="150" style="border-radius:50%;" />
+</p>
+
+<p align="center">
+  <b>Into.AI Developer</b><br/>
+  AI Enthusiast & Developer<br/>
+  <a href="https://github.com/prakit1234">GitHub</a>
+</p>
+
+---
+
+<p align="center">
+  © 2025 All Rights Reserved.
+</p>
