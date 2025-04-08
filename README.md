@@ -74,17 +74,17 @@ No permission is granted for:
 
 ## Credit
 
-Original concept inspired by work from Prakit Chetia, with significant modifications and enhancements.
+Original concept inspired by work from kai, with significant modifications and enhancements.
 
 ## Author
 
 <p align="center">
-  <img src="https://avatars.githubusercontent.com/u/prakit1234" alt="Your Name" width="150" height="150" style="border-radius:50%;" />
+  <img src="https://avatars.githubusercontent.com/u/prakit1234" alt="Kaii" width="150" height="150" style="border-radius:50%;" />
 </p>
 
 <p align="center">
-  <b>Into.AI Developer</b><br/>
-  AI Enthusiast & Developer<br/>
+  <b>Kaii</b><br/>
+  Web dev<br/>
   <a href="https://github.com/prakit1234">GitHub</a>
 </p>
 
