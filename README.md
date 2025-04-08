@@ -10,7 +10,7 @@
   <img src="https://i.ibb.co/xt66pCdQ/Screenshot-2025-04-08-213428.png" alt="Into.AI Logo" width="400" />
 </p>
 
-## ⚠️ IMPORTANT NOTICE ⚠️
+## IMPORTANT NOTICE 
 
 **THIS REPOSITORY IS PRIVATE AND FOR PERSONAL USE ONLY**
 
@@ -79,7 +79,7 @@ Original concept inspired by work from kai, with significant modifications and e
 ## Author
 
 <p align="center">
-  <img src="https://avatars.githubusercontent.com/u/prakit1234" alt="Kaii" width="150" height="150" style="border-radius:50%;" />
+  <img src="https://i.ibb.co/tPL2TKDY/toji.png" alt="Kaii" width="150" height="150" style="border-radius:50%;" />
 </p>
 
 <p align="center">
