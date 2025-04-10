@@ -1,50 +1,23 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 
 export const useAuthStore = defineStore('auth', () => {
-  const router = useRouter()
-  const user = ref(JSON.parse(localStorage.getItem('user') || 'null'))
-  const isAuthenticated = ref(!!user.value)
+  const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0()
   const loading = ref(false)
 
-  async function login() {
+  const setUser = (userData: any) => {
+    user.value = userData
+  }
+
+  const clearUser = () => {
+    user.value = null
+  }
+
+  const login = async () => {
     try {
       loading.value = true
-      
-      // Initialize Google OAuth client
-      const client = google.accounts.oauth2.initTokenClient({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-        scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-        callback: async (response: any) => {
-          if (response.access_token) {
-            // Get user info using the access token
-            const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-              headers: {
-                Authorization: `Bearer ${response.access_token}`
-              }
-            }).then(res => res.json())
-
-            // Set user data
-            const userData = {
-              id: userInfo.sub,
-              email: userInfo.email,
-              name: userInfo.name,
-              picture: userInfo.picture,
-              token: response.access_token
-            }
-            
-            // Save to localStorage
-            localStorage.setItem('user', JSON.stringify(userData))
-    user.value = userData
-    isAuthenticated.value = true
-            router.push('/app')
-          }
-        }
-      })
-
-      // Request access token
-      client.requestAccessToken()
+      await loginWithRedirect()
     } catch (error) {
       console.error('Login error:', error)
     } finally {
@@ -52,21 +25,11 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function handleLogout() {
+  const handleLogout = async () => {
     try {
       loading.value = true
-      // Revoke the access token
-      if (google.accounts.oauth2 && user.value?.token) {
-        google.accounts.oauth2.revoke(user.value.token, () => {
-          console.log('Access token revoked')
-        })
-      }
-      // Clear user data
-      localStorage.removeItem('user')
-    user.value = null
-    isAuthenticated.value = false
-      // Redirect to login page
-      router.push('/login')
+      await logout({ logoutParams: { returnTo: window.location.origin } })
+      clearUser()
     } catch (error) {
       console.error('Logout error:', error)
     } finally {
@@ -79,6 +42,8 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     loading,
     login,
-    handleLogout
+    handleLogout,
+    setUser,
+    clearUser
   }
 }) 
