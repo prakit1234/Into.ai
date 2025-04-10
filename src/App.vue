@@ -1,39 +1,89 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const isGoogleLoaded = ref(false)
 
 function handleLogout() {
   authStore.clearUser()
   router.push('/login')
 }
 
-onMounted(() => {
-  // Initialize Google One Tap if user is not authenticated
-  if (!authStore.isAuthenticated) {
-    window.google.accounts.id.initialize({
-      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-      callback: (response: { credential: string }) => {
-        const { credential } = response
-        const decoded = JSON.parse(atob(credential.split('.')[1]))
-        
-        authStore.setUser({
-          id: decoded.sub,
-          email: decoded.email,
-          name: decoded.name,
-          picture: decoded.picture,
-          token: credential
-        })
-        
-        // Redirect to app page after successful authentication
+function loadGoogleScript() {
+  return new Promise<void>((resolve) => {
+    if (window.google?.accounts) {
+      isGoogleLoaded.value = true
+      resolve()
+      return
+    }
+
+    const script = document.createElement('script')
+    script.src = 'https://accounts.google.com/gsi/client'
+    script.async = true
+    script.defer = true
+    script.onload = () => {
+      isGoogleLoaded.value = true
+      resolve()
+    }
+    document.head.appendChild(script)
+  })
+}
+
+onMounted(async () => {
+  // Try to restore session from localStorage first
+  const savedUser = localStorage.getItem('user')
+  if (savedUser) {
+    try {
+      const userData = JSON.parse(savedUser)
+      // Check if token is expired
+      const expires_at = userData.expires_at
+      if (expires_at && Date.now() < expires_at) {
+        authStore.setUser(userData)
         router.push('/app')
+        return
+      } else {
+        localStorage.removeItem('user')
       }
-    })
+    } catch (error) {
+      console.error('Failed to restore session:', error)
+      localStorage.removeItem('user')
+    }
+  }
+
+  // If no valid session, initialize Google One Tap
+  if (!authStore.isAuthenticated) {
+    await loadGoogleScript()
     
-    window.google.accounts.id.prompt()
+    if (isGoogleLoaded.value && window.google?.accounts) {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: (response: CredentialResponse) => {
+          const { credential } = response
+          const decoded = JSON.parse(atob(credential.split('.')[1]))
+          
+          // Set expiration to 1 hour from now (typical JWT expiration)
+          const expires_at = Date.now() + (3600 * 1000)
+          
+          authStore.setUser({
+            id: decoded.sub,
+            email: decoded.email,
+            name: decoded.name,
+            picture: decoded.picture,
+            token: credential,
+            expires_at
+          })
+          
+          router.push('/app')
+        },
+        auto_select: false,
+        cancel_on_tap_outside: true
+      })
+      
+      window.google.accounts.id.prompt()
+    }
   }
 })
 </script>
