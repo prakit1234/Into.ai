@@ -128,7 +128,6 @@ import { marked } from 'marked'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 import { generateResponse } from '../services/gemini'
-import html2pdf from 'html2pdf.js'
 
 const router = useRouter()
 const authStore = useAuthStore()
