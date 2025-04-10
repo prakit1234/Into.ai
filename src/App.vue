@@ -9,15 +9,13 @@ const authStore = useAuthStore()
 // Get client ID from environment variables
 const clientId = computed(() => import.meta.env.VITE_GOOGLE_CLIENT_ID)
 
-// Declare the global callback function
-declare global {
-  interface Window {
-    handleCredentialResponse: (response: {
-      credential: string;
-      select_by: string;
-      client_id: string;
-    }) => void;
-  }
+// Create type declaration file for global types
+const initGoogleScript = () => {
+  const script = document.createElement('script')
+  script.src = 'https://accounts.google.com/gsi/client'
+  script.async = true
+  script.defer = true
+  document.head.appendChild(script)
 }
 
 function handleLogout() {
@@ -46,6 +44,9 @@ function handleCredentialResponse(response: { credential: string }) {
 }
 
 onMounted(() => {
+  // Initialize Google One Tap script
+  initGoogleScript()
+
   // Try to restore session from localStorage first
   const savedUser = localStorage.getItem('user')
   if (savedUser) {
@@ -66,7 +67,7 @@ onMounted(() => {
   }
 
   // Add the callback to window for Google One Tap
-  window.handleCredentialResponse = handleCredentialResponse
+  ;(window as any).handleCredentialResponse = handleCredentialResponse
 })
 </script>
 
@@ -168,12 +169,3 @@ html, body {
   flex-direction: column;
 }
 </style>
-
-<script>
-// Add the Google One Tap script
-const script = document.createElement('script')
-script.src = 'https://accounts.google.com/gsi/client'
-script.async = true
-script.defer = true
-document.head.appendChild(script)
-</script>
