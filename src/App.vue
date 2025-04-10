@@ -1,10 +1,24 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 
 const router = useRouter()
 const authStore = useAuthStore()
+
+// Get client ID from environment variables
+const clientId = computed(() => import.meta.env.VITE_GOOGLE_CLIENT_ID)
+
+// Declare the global callback function
+declare global {
+  interface Window {
+    handleCredentialResponse: (response: {
+      credential: string;
+      select_by: string;
+      client_id: string;
+    }) => void;
+  }
+}
 
 function handleLogout() {
   authStore.clearUser()
@@ -12,7 +26,7 @@ function handleLogout() {
 }
 
 // Handle the callback from Google One Tap
-function handleCredentialResponse(response: any) {
+function handleCredentialResponse(response: { credential: string }) {
   const { credential } = response
   const decoded = JSON.parse(atob(credential.split('.')[1]))
   
@@ -61,7 +75,7 @@ onMounted(() => {
     <!-- Google One Tap -->
     <div
       id="g_id_onload"
-      :data-client_id="import.meta.env.VITE_GOOGLE_CLIENT_ID"
+      :data-client_id="clientId"
       data-callback="handleCredentialResponse"
       data-auto_select="false"
       data-itp_support="true"
