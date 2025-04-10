@@ -19,18 +19,18 @@
         <router-link to="/" class="inline-flex items-center">
           <span class="text-3xl font-extralight text-white tracking-wider">Into.AI</span>
         </router-link>
-        <h2 class="mt-6 text-3xl font-extralight text-white">Welcome back</h2>
+        <h2 class="mt-6 text-3xl font-extralight text-white">Create your account</h2>
         <p class="mt-2 text-sm text-gray-400 font-light">
-          Sign in to access AI-powered instructions
+          Sign up to access AI-powered instructions
         </p>
       </div>
 
-      <!-- Login Card -->
+      <!-- Signup Card -->
       <div class="relative group">
         <div class="absolute -inset-1 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg blur-lg group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
         <div class="relative py-8 px-6 bg-black/50 backdrop-blur-sm border border-gray-800/50 rounded-lg">
           <div class="space-y-6">
-            <!-- Auth0 Login Button -->
+            <!-- Auth0 Signup Button -->
             <div>
               <button
                 @click="login"
@@ -54,12 +54,20 @@
                     fill="#EA4335"
                   />
                 </svg>
-                <span class="text-sm font-light">Sign in with Google</span>
+                <span class="text-sm font-light">Sign up with Google</span>
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Login Link -->
+      <p class="mt-8 text-center text-sm text-gray-500 font-light">
+        Already have an account?
+        <router-link to="/login" class="font-light text-purple-400 hover:text-purple-300">
+          Sign in
+        </router-link>
+      </p>
 
       <!-- Credits -->
       <p class="mt-6 text-center text-xs text-gray-600 font-light">

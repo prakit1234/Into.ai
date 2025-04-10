@@ -1,25 +1,40 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY)
 
-const genAI = new GoogleGenerativeAI(API_KEY)
+export async function generateResponse(query: string, type: string = 'basic'): Promise<string> {
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
 
-export const models = {
-  basic: genAI.getGenerativeModel({ model: 'gemini-2.0-flash' }),
-  instructive: genAI.getGenerativeModel({ model: 'gemini-1.5-pro' }),
-  explanatory: genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
-}
+  let prompt = ''
 
-export async function generateResponse(prompt: string, variant: 'basic' | 'instructive' | 'explanatory') {
-  try {
-    const model = models[variant]
-    const result = await model.generateContent(prompt)
-    const response = await result.response
-    return response.text()
-  } catch (error) {
-    console.error('Error generating response:', error)
-    throw error
+  switch (type) {
+    case 'basic':
+      prompt = `Provide simple, straightforward steps for: ${query}. Keep it concise and clear.`
+      break
+    case 'instructive':
+      prompt = `Provide detailed instructions for: ${query}. Include relevant links and resources where applicable. Format the response with markdown links.`
+      break
+    case 'explanatory':
+      prompt = `Provide a comprehensive guide for: ${query}. Include:
+1. Detailed step-by-step instructions
+2. Pros and cons for each major step
+3. Relevant links and resources
+4. Common pitfalls and how to avoid them
+5. Best practices and tips
+
+Format the response with markdown, including:
+- Headers for each section
+- Bullet points for pros and cons
+- Links to resources
+- Code blocks where applicable`
+      break
+    default:
+      prompt = `Provide instructions for: ${query}`
   }
+
+  const result = await model.generateContent(prompt)
+  const response = await result.response
+  return response.text()
 }
 
 export const prompts = {

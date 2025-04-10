@@ -26,6 +26,9 @@ onMounted(() => {
           name: decoded.name,
           picture: decoded.picture
         })
+        
+        // Redirect to app page after successful authentication
+        router.push('/app')
       })
       .catch(() => {
         // Silently fail as this is just an enhancement
@@ -35,40 +38,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col bg-gray-50">
+  <div class="min-h-screen w-full">
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex">
-            <router-link to="/" class="flex items-center">
-              <span class="text-xl font-bold text-blue-600">Into.AI</span>
-            </router-link>
-            <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <router-link
-                to="/"
-                class="inline-flex items-center px-1 pt-1 text-sm font-medium"
-                :class="[$route.path === '/' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700']"
-              >
-                Home
-              </router-link>
-              <router-link
-                to="/blog"
-                class="inline-flex items-center px-1 pt-1 text-sm font-medium"
-                :class="[$route.path === '/blog' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700']"
-              >
-                Blog
-              </router-link>
-              <router-link
-                to="/errors"
-                class="inline-flex items-center px-1 pt-1 text-sm font-medium"
-                :class="[$route.path === '/errors' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700']"
-              >
-                Error Guide
-              </router-link>
+    <nav class="w-full fixed top-0 z-50 border-b border-gray-800/50 backdrop-blur-sm bg-black/30">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+        <div class="flex items-center">
+          <router-link to="/" class="text-2xl font-extralight text-white tracking-wider">Into.AI</router-link>
             </div>
-          </div>
-          <div class="flex items-center">
+        <div class="flex items-center space-x-6">
             <template v-if="authStore.isAuthenticated">
               <div class="flex items-center space-x-4">
                 <img
@@ -76,79 +53,50 @@ onMounted(() => {
                   :alt="authStore.user?.name"
                   class="h-8 w-8 rounded-full"
                 />
-                <span class="text-sm text-gray-700">{{ authStore.user?.name }}</span>
+              <span class="text-gray-300 font-light">{{ authStore.user?.name }}</span>
                 <button
                   @click="handleLogout"
-                  class="text-sm text-gray-500 hover:text-gray-700"
+                class="text-gray-300 hover:text-white font-light transition-colors"
                 >
                   Logout
                 </button>
               </div>
             </template>
             <template v-else>
-              <router-link
-                to="/login"
-                class="text-sm font-medium text-blue-600 hover:text-blue-500"
-              >
-                Sign in
+            <router-link to="/login" class="text-gray-300 hover:text-white font-light transition-colors">Login</router-link>
+            <router-link to="/signup" class="px-4 py-2 border border-white/30 backdrop-blur-sm hover:bg-white/10 text-white font-light transition-all duration-200 rounded-sm">
+              Sign Up
               </router-link>
             </template>
-          </div>
         </div>
       </div>
     </nav>
 
-    <!-- Mobile Navigation -->
-    <div class="sm:hidden">
-      <div class="pt-2 pb-3 space-y-1">
-        <router-link
-          to="/"
-          class="block pl-3 pr-4 py-2 text-base font-medium"
-          :class="[$route.path === '/' ? 'text-blue-600 border-l-4 border-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700']"
-        >
-          Home
-        </router-link>
-        <router-link
-          to="/blog"
-          class="block pl-3 pr-4 py-2 text-base font-medium"
-          :class="[$route.path === '/blog' ? 'text-blue-600 border-l-4 border-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700']"
-        >
-          Blog
-        </router-link>
-        <router-link
-          to="/errors"
-          class="block pl-3 pr-4 py-2 text-base font-medium"
-          :class="[$route.path === '/errors' ? 'text-blue-600 border-l-4 border-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700']"
-        >
-          Error Guide
-        </router-link>
-      </div>
-    </div>
-
     <!-- Main Content -->
-    <main class="flex-grow">
+    <main class="flex-grow pt-16">
       <router-view></router-view>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200">
-      <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center">
-          <div class="text-gray-500 text-sm">
+    <footer class="w-full py-12 bg-black border-t border-gray-800/50">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <p class="text-gray-400 font-light mb-4">
+          Made with ♥ by Kaii
+        </p>
+        <a 
+          href="https://github.com/prakit1234" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="inline-flex items-center text-gray-400 hover:text-white transition-colors font-light"
+        >
+          <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+          </svg>
+          github.com/prakit1234
+        </a>
+        <p class="text-gray-600 font-light text-sm mt-6">
             © 2024 Into.AI. All rights reserved.
-          </div>
-          <div class="flex space-x-6">
-            <a href="#" class="text-gray-500 hover:text-gray-700">
-              Privacy Policy
-            </a>
-            <a href="#" class="text-gray-500 hover:text-gray-700">
-              Terms of Service
-            </a>
-            <a href="#" class="text-gray-500 hover:text-gray-700">
-              Contact
-            </a>
-          </div>
-        </div>
+        </p>
       </div>
     </footer>
   </div>

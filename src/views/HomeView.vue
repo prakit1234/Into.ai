@@ -3,13 +3,21 @@
     <!-- Header -->
     <header class="w-full border-b border-gray-800/50 backdrop-blur-sm bg-black/30">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <h1 class="text-2xl font-extralight text-white">AI Instructions</h1>
+        <div class="flex justify-between items-center">
+          <h1 class="text-2xl font-extralight text-white">AI Instructions</h1>
+          <button
+            @click="handleLogout"
+            class="text-gray-400 hover:text-white font-light transition-colors"
+          >
+            Logout
+          </button>
+        </div>
       </div>
     </header>
 
     <!-- Main Content -->
     <main class="w-full">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Query Input -->
         <div class="relative mb-8 group">
           <div class="absolute -inset-1 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg blur-lg group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
@@ -19,6 +27,25 @@
             rows="4"
             placeholder="What would you like instructions for?"
           ></textarea>
+        </div>
+
+        <!-- Instruction Type Selection -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div
+            v-for="(type, index) in instructionTypes"
+            :key="index"
+            class="relative group cursor-pointer"
+            @click="selectedType = type.value"
+          >
+            <div class="absolute -inset-1 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-lg blur-lg group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+            <div
+              class="relative p-6 bg-black/50 backdrop-blur-sm border border-gray-800/50 rounded-lg"
+              :class="{ 'border-purple-500/50': selectedType === type.value }"
+            >
+              <h3 class="text-xl font-light text-white mb-2">{{ type.title }}</h3>
+              <p class="text-gray-400 font-light">{{ type.description }}</p>
+            </div>
+          </div>
         </div>
 
         <!-- Submit Button -->
@@ -62,6 +89,28 @@
           <div class="relative group">
             <div class="absolute -inset-1 bg-gradient-to-r from-purple-600/10 to-blue-600/10 rounded-lg blur-lg"></div>
             <div class="relative p-6 bg-black/50 backdrop-blur-sm border border-gray-800/50 rounded-lg">
+              <!-- Download Options -->
+              <div class="flex justify-end gap-4 mb-6">
+                <button
+                  @click="downloadAsPDF"
+                  class="flex items-center gap-2 px-4 py-2 text-sm font-light text-gray-300 bg-black/50 hover:bg-black/70 border border-gray-700/50 rounded-lg transition-all duration-200"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Download PDF
+                </button>
+                <button
+                  @click="downloadAsTXT"
+                  class="flex items-center gap-2 px-4 py-2 text-sm font-light text-gray-300 bg-black/50 hover:bg-black/70 border border-gray-700/50 rounded-lg transition-all duration-200"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Download TXT
+                </button>
+              </div>
+
               <div class="prose prose-invert max-w-none">
                 <div v-html="marked(response)" class="text-gray-300 font-light"></div>
               </div>
@@ -76,12 +125,38 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { marked } from 'marked'
+import { useAuthStore } from '../stores/auth'
+import { useRouter } from 'vue-router'
 import { generateResponse } from '../services/gemini'
+import html2pdf from 'html2pdf.js'
+
+const router = useRouter()
+const authStore = useAuthStore()
+const { user, handleLogout } = authStore
 
 const query = ref('')
 const response = ref('')
 const loading = ref(false)
 const error = ref('')
+const selectedType = ref('basic')
+
+const instructionTypes = [
+  {
+    title: 'Basic Instructions',
+    value: 'basic',
+    description: 'Simple, straightforward steps to get you started quickly.'
+  },
+  {
+    title: 'Instructive Guide',
+    value: 'instructive',
+    description: 'Detailed steps with helpful links and resources.'
+  },
+  {
+    title: 'Explanatory Guide',
+    value: 'explanatory',
+    description: 'Comprehensive guide with pros, cons, and detailed explanations.'
+  }
+]
 
 async function getInstructions() {
   if (!query.value.trim()) {
@@ -94,13 +169,44 @@ async function getInstructions() {
   response.value = ''
 
   try {
-    const result = await generateResponse(query.value, 'basic')
+    const result = await generateResponse(query.value, selectedType.value)
     response.value = result
   } catch (e: any) {
     error.value = e.message || 'Failed to get instructions. Please try again.'
   } finally {
     loading.value = false
   }
+}
+
+function downloadAsPDF() {
+  const element = document.querySelector('.prose')
+  if (!element) return
+
+  const opt = {
+    margin: 1,
+    filename: 'instructions.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+  }
+
+  html2pdf().set(opt).from(element).save()
+}
+
+function downloadAsTXT() {
+  const element = document.querySelector('.prose')
+  if (!element) return
+
+  const text = element.textContent || ''
+  const blob = new Blob([text], { type: 'text/plain' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'instructions.txt'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
 }
 </script>
 
