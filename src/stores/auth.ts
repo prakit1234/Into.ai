@@ -37,7 +37,7 @@ export const useAuthStore = defineStore('auth', () => {
       const client = window.google.accounts.oauth2.initTokenClient({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-        callback: async (response: any) => {
+        callback: async (response: { access_token: string }) => {
           if (response.access_token) {
             // Get user info using the access token
             const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {

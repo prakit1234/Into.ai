@@ -16,7 +16,7 @@ onMounted(() => {
   if (!authStore.isAuthenticated) {
     window.google.accounts.id.initialize({
       client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-      callback: (response: any) => {
+      callback: (response: { credential: string }) => {
         const { credential } = response
         const decoded = JSON.parse(atob(credential.split('.')[1]))
         
