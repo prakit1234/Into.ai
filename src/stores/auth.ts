@@ -7,7 +7,7 @@ interface User {
   email: string
   name: string
   picture: string
-  token: string
+  token?: string
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -34,7 +34,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       loading.value = true
       // Initialize Google OAuth client
-      const client = google.accounts.oauth2.initTokenClient({
+      const client = window.google.accounts.oauth2.initTokenClient({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
         callback: async (response: any) => {
@@ -74,8 +74,8 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       loading.value = true
       // Revoke the access token
-      if (google.accounts.oauth2 && user.value?.token) {
-        google.accounts.oauth2.revoke(user.value.token, () => {
+      if (window.google?.accounts?.oauth2 && user.value?.token) {
+        window.google.accounts.oauth2.revoke(user.value.token, () => {
           console.log('Access token revoked')
         })
       }

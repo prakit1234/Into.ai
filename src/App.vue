@@ -2,7 +2,6 @@
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
-import { googleOneTap } from 'vue3-google-login'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -15,8 +14,9 @@ function handleLogout() {
 onMounted(() => {
   // Initialize Google One Tap if user is not authenticated
   if (!authStore.isAuthenticated) {
-    googleOneTap()
-      .then((response: any) => {
+    window.google.accounts.id.initialize({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      callback: (response: any) => {
         const { credential } = response
         const decoded = JSON.parse(atob(credential.split('.')[1]))
         
@@ -24,15 +24,16 @@ onMounted(() => {
           id: decoded.sub,
           email: decoded.email,
           name: decoded.name,
-          picture: decoded.picture
+          picture: decoded.picture,
+          token: credential
         })
         
         // Redirect to app page after successful authentication
         router.push('/app')
-      })
-      .catch(() => {
-        // Silently fail as this is just an enhancement
-      })
+      }
+    })
+    
+    window.google.accounts.id.prompt()
   }
 })
 </script>
@@ -44,37 +45,40 @@ onMounted(() => {
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <div class="flex items-center">
           <router-link to="/" class="text-2xl font-extralight text-white tracking-wider">Into.AI</router-link>
-            </div>
+        </div>
         <div class="flex items-center space-x-6">
-            <template v-if="authStore.isAuthenticated">
-              <div class="flex items-center space-x-4">
-                <img
-                  :src="authStore.user?.picture"
-                  :alt="authStore.user?.name"
-                  class="h-8 w-8 rounded-full"
-                />
+          <template v-if="authStore.isAuthenticated">
+            <div class="flex items-center space-x-4">
+              <img
+                v-if="authStore.user?.picture"
+                :src="authStore.user.picture"
+                :alt="authStore.user.name"
+                class="w-8 h-8 rounded-full"
+              />
               <span class="text-gray-300 font-light">{{ authStore.user?.name }}</span>
-                <button
-                  @click="handleLogout"
-                class="text-gray-300 hover:text-white font-light transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
-            </template>
-            <template v-else>
-            <router-link to="/login" class="text-gray-300 hover:text-white font-light transition-colors">Login</router-link>
-            <router-link to="/signup" class="px-4 py-2 border border-white/30 backdrop-blur-sm hover:bg-white/10 text-white font-light transition-all duration-200 rounded-sm">
-              Sign Up
-              </router-link>
-            </template>
+              <button
+                @click="handleLogout"
+                class="text-gray-400 hover:text-white font-light transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </template>
+          <template v-else>
+            <router-link
+              to="/login"
+              class="text-gray-300 hover:text-white font-light transition-colors"
+            >
+              Login
+            </router-link>
+          </template>
         </div>
       </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="flex-grow pt-16">
-      <router-view></router-view>
+    <main class="pt-16">
+      <router-view />
     </main>
 
     <!-- Footer -->
