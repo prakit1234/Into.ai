@@ -5,34 +5,33 @@ import { useAuthStore } from './stores/auth'
 
 const router = useRouter()
 const authStore = useAuthStore()
-const isGoogleLoaded = ref(false)
 
 function handleLogout() {
   authStore.clearUser()
   router.push('/login')
 }
 
-function loadGoogleScript() {
-  return new Promise<void>((resolve) => {
-    if (window.google?.accounts) {
-      isGoogleLoaded.value = true
-      resolve()
-      return
-    }
-
-    const script = document.createElement('script')
-    script.src = 'https://accounts.google.com/gsi/client'
-    script.async = true
-    script.defer = true
-    script.onload = () => {
-      isGoogleLoaded.value = true
-      resolve()
-    }
-    document.head.appendChild(script)
+// Handle the callback from Google One Tap
+function handleCredentialResponse(response: any) {
+  const { credential } = response
+  const decoded = JSON.parse(atob(credential.split('.')[1]))
+  
+  // Set expiration to 1 hour from now (typical JWT expiration)
+  const expires_at = Date.now() + (3600 * 1000)
+  
+  authStore.setUser({
+    id: decoded.sub,
+    email: decoded.email,
+    name: decoded.name,
+    picture: decoded.picture,
+    token: credential,
+    expires_at
   })
+  
+  router.push('/app')
 }
 
-onMounted(async () => {
+onMounted(() => {
   // Try to restore session from localStorage first
   const savedUser = localStorage.getItem('user')
   if (savedUser) {
@@ -43,7 +42,6 @@ onMounted(async () => {
       if (expires_at && Date.now() < expires_at) {
         authStore.setUser(userData)
         router.push('/app')
-        return
       } else {
         localStorage.removeItem('user')
       }
@@ -53,43 +51,22 @@ onMounted(async () => {
     }
   }
 
-  // If no valid session, initialize Google One Tap
-  if (!authStore.isAuthenticated) {
-    await loadGoogleScript()
-    
-    if (isGoogleLoaded.value && window.google?.accounts) {
-      window.google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-        callback: (response: CredentialResponse) => {
-          const { credential } = response
-          const decoded = JSON.parse(atob(credential.split('.')[1]))
-          
-          // Set expiration to 1 hour from now (typical JWT expiration)
-          const expires_at = Date.now() + (3600 * 1000)
-          
-          authStore.setUser({
-            id: decoded.sub,
-            email: decoded.email,
-            name: decoded.name,
-            picture: decoded.picture,
-            token: credential,
-            expires_at
-          })
-          
-          router.push('/app')
-        },
-        auto_select: false,
-        cancel_on_tap_outside: true
-      })
-      
-      window.google.accounts.id.prompt()
-    }
-  }
+  // Add the callback to window for Google One Tap
+  window.handleCredentialResponse = handleCredentialResponse
 })
 </script>
 
 <template>
   <div class="min-h-screen w-full">
+    <!-- Google One Tap -->
+    <div
+      id="g_id_onload"
+      :data-client_id="import.meta.env.VITE_GOOGLE_CLIENT_ID"
+      data-callback="handleCredentialResponse"
+      data-auto_select="false"
+      data-itp_support="true"
+    ></div>
+
     <!-- Navigation -->
     <nav class="w-full fixed top-0 z-50 border-b border-gray-800/50 backdrop-blur-sm bg-black/30">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
@@ -177,3 +154,12 @@ html, body {
   flex-direction: column;
 }
 </style>
+
+<script>
+// Add the Google One Tap script
+const script = document.createElement('script')
+script.src = 'https://accounts.google.com/gsi/client'
+script.async = true
+script.defer = true
+document.head.appendChild(script)
+</script>
