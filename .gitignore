@@ -16,7 +16,7 @@ coverage
 *.local
 .env
 .env.local
-.env.development
+
 .env.production
 
 /cypress/videos/
