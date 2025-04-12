@@ -9,13 +9,32 @@ const authStore = useAuthStore()
 // Get client ID from environment variables
 const clientId = computed(() => import.meta.env.VITE_GOOGLE_CLIENT_ID)
 
-// Create type declaration file for global types
-const initGoogleScript = () => {
-  const script = document.createElement('script')
-  script.src = 'https://accounts.google.com/gsi/client'
-  script.async = true
-  script.defer = true
-  document.head.appendChild(script)
+// Initialize Google One Tap script
+function initGoogleScript() {
+  if (!document.getElementById('google-script')) {
+    const script = document.createElement('script')
+    script.id = 'google-script'
+    script.src = 'https://accounts.google.com/gsi/client'
+    script.async = true
+    script.defer = true
+    script.onload = configureGoogleOneTap
+    document.head.appendChild(script)
+  } else {
+    configureGoogleOneTap()
+  }
+}
+
+// Configure Google One Tap
+function configureGoogleOneTap() {
+  if (window.google?.accounts?.id) {
+    // Initialize Google One Tap
+    window.google.accounts.id.initialize({
+      client_id: clientId.value,
+      callback: handleCredentialResponse,
+      auto_select: false,
+      cancel_on_tap_outside: true
+    })
+  }
 }
 
 function handleLogout() {
@@ -73,7 +92,7 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen w-full">
-    <!-- Google One Tap -->
+    <!-- Google One Tap (hidden, using auto display) -->
     <div
       id="g_id_onload"
       :data-client_id="clientId"
